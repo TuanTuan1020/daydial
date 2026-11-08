@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><style>
+@font-face { font-family: "Bricolage Grotesque"; src: url("../assets/fonts/bricolage-grotesque-latin.woff2") format("woff2"); font-weight: 200 800; }
+@font-face { font-family: "IBM Plex Mono"; src: url("../assets/fonts/ibm-plex-mono-400-latin.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "IBM Plex Mono"; src: url("../assets/fonts/ibm-plex-mono-500-latin.woff2") format("woff2"); font-weight: 500; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+body {
+  background-color: #E7E7E1;
+  background-image: radial-gradient(rgba(21,26,22,.16) .65px, transparent .65px);
+  background-size: 22px 22px;
+  color: #151A16;
+  font-family: "Bricolage Grotesque", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.card { position: relative; width: 1200px; height: 630px; padding: 58px 64px; }
+.brand { display: flex; align-items: center; gap: 12px; height: 40px; }
+.brand svg { width: 34px; height: 34px; }
+.brand b { font-family: "Songti SC", "STSong", "SimSun", serif; font-size: 24px; font-weight: 500; letter-spacing: .06em; }
+.brand i { align-self: flex-end; margin-bottom: 3px; font-family: "IBM Plex Mono", monospace; font-style: normal; font-size: 9px; letter-spacing: .2em; color: #596157; }
+h1 { margin: 96px 0 0; font-family: "Songti SC", "STSong", "SimSun", serif; font-size: 68px; line-height: 1.18; font-weight: 500; letter-spacing: .01em; }
+.lede { margin: 30px 0 0; font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: .12em; color: #596157; }
+.foot { position: absolute; left: 64px; bottom: 54px; font-size: 13px; line-height: 1.8; color: #596157; }
+.foot b { color: #151A16; font-weight: 500; }
+.dial { position: absolute; right: 54px; top: 92px; width: 438px; height: 438px; }
+.dial svg { width: 100%; height: 100%; overflow: visible; }
+.tick { stroke: rgba(21,26,22,.28); stroke-width: 1; }
+.tick.major { stroke: rgba(21,26,22,.6); stroke-width: 1.5; }
+.arc { fill: none; stroke-width: 15; stroke-linecap: round; }
+.now { stroke: #C22F22; stroke-width: 1.6; stroke-linecap: round; }
+.hub { position: absolute; left: 50%; top: 50%; width: 210px; height: 210px; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.weekday { font-family: "Songti SC", serif; font-size: 15px; letter-spacing: .18em; color: #343C35; }
+.hub b { font-family: "Bricolage Grotesque", sans-serif; font-size: 86px; font-weight: 500; line-height: .9; letter-spacing: -.06em; margin-top: 2px; }
+.hub span { margin-top: 7px; font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: .08em; color: #596157; }
+.hub em { margin-top: 16px; font-family: "Bricolage Grotesque", sans-serif; font-style: normal; font-size: 11px; color: #343C35; }
+.rule { display: block; width: 26px; height: 1px; background: rgba(21,26,22,.34); margin: 12px 0 0; }
+</style></head><body>
+<div class="card">
+  <div class="brand">
+    <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M20 3v3M20 34v3M3 20h3M34 20h3M8 8l2 2M30 30l2 2M32 8l-2 2M10 30l-2 2" stroke="currentColor" stroke-width="1.1"/><circle cx="20" cy="20" r="1.5" fill="currentColor"/><path d="M20 20L20 9" stroke="#C22F22" stroke-width="2" stroke-linecap="round"/></svg>
+    <b>日晷</b><i>DAYDIAL</i>
+  </div>
+  <h1>把一天，<br>看成一个圆。</h1>
+  <p class="lede">24 小时 · 本地保存 · 不登录</p>
+  <p class="foot"><b>拖动圆盘安排时间。颜色标记节奏。</b><br>数据只留在浏览器里。</p>
+  <div class="dial">
+    <svg viewBox="0 0 680 680" aria-hidden="true">
+      <circle cx="340" cy="340" r="312" fill="none" stroke="rgba(21,26,22,.34)" stroke-width="1"/>
+      <circle cx="340" cy="340" r="184" fill="none" stroke="rgba(21,26,22,.16)" stroke-width="1"/>
+      <g>
+        <line class="tick major" x1="44.00" y1="340.00" x2="28.00" y2="340.00"/><line class="tick" x1="34.66" y1="319.99" x2="28.67" y2="319.59"/><line class="tick" x1="36.62" y1="300.06" x2="30.67" y2="299.28"/><line class="tick" x1="39.88" y1="280.30" x2="33.99" y2="279.13"/><line class="tick" x1="44.43" y1="260.80" x2="38.63" y2="259.25"/><line class="tick" x1="50.24" y1="241.64" x2="44.56" y2="239.71"/><line class="tick" x1="57.29" y1="222.90" x2="51.75" y2="220.60"/><line class="tick" x1="65.56" y1="204.66" x2="60.18" y2="202.01"/><line class="tick" x1="75.00" y1="187.00" x2="69.80" y2="184.00"/><line class="tick" x1="85.57" y1="170.00" x2="80.58" y2="166.66"/><line class="tick" x1="97.23" y1="153.72" x2="92.47" y2="150.07"/><line class="tick" x1="109.94" y1="138.24" x2="105.43" y2="134.28"/><line class="tick major" x1="130.70" y1="130.70" x2="119.38" y2="119.38"/><line class="tick" x1="138.24" y1="109.94" x2="134.28" y2="105.43"/><line class="tick" x1="153.72" y1="97.23" x2="150.07" y2="92.47"/><line class="tick" x1="170.00" y1="85.57" x2="166.66" y2="80.58"/><line class="tick" x1="187.00" y1="75.00" x2="184.00" y2="69.80"/><line class="tick" x1="204.66" y1="65.56" x2="202.01" y2="60.18"/><line class="tick" x1="222.90" y1="57.29" x2="220.60" y2="51.75"/><line class="tick" x1="241.64" y1="50.24" x2="239.71" y2="44.56"/><line class="tick" x1="260.80" y1="44.43" x2="259.25" y2="38.63"/><line class="tick" x1="280.30" y1="39.88" x2="279.13" y2="33.99"/><line class="tick" x1="300.06" y1="36.62" x2="299.28" y2="30.67"/><line class="tick" x1="319.99" y1="34.66" x2="319.59" y2="28.67"/><line class="tick major" x1="340.00" y1="44.00" x2="340.00" y2="28.00"/><line class="tick" x1="360.01" y1="34.66" x2="360.41" y2="28.67"/><line class="tick" x1="379.94" y1="36.62" x2="380.72" y2="30.67"/><line class="tick" x1="399.70" y1="39.88" x2="400.87" y2="33.99"/><line class="tick" x1="419.20" y1="44.43" x2="420.75" y2="38.63"/><line class="tick" x1="438.36" y1="50.24" x2="440.29" y2="44.56"/><line class="tick" x1="457.10" y1="57.29" x2="459.40" y2="51.75"/><line class="tick" x1="475.34" y1="65.56" x2="477.99" y2="60.18"/><line class="tick" x1="493.00" y1="75.00" x2="496.00" y2="69.80"/><line class="tick" x1="510.00" y1="85.57" x2="513.34" y2="80.58"/><line class="tick" x1="526.28" y1="97.23" x2="529.93" y2="92.47"/><line class="tick" x1="541.76" y1="109.94" x2="545.72" y2="105.43"/><line class="tick major" x1="549.30" y1="130.70" x2="560.62" y2="119.38"/><line class="tick" x1="570.06" y1="138.24" x2="574.57" y2="134.28"/><line class="tick" x1="582.77" y1="153.72" x2="587.53" y2="150.07"/><line class="tick" x1="594.43" y1="170.00" x2="599.42" y2="166.66"/><line class="tick" x1="605.00" y1="187.00" x2="610.20" y2="184.00"/><line class="tick" x1="614.44" y1="204.66" x2="619.82" y2="202.01"/><line class="tick" x1="622.71" y1="222.90" x2="628.25" y2="220.60"/><line class="tick" x1="629.76" y1="241.64" x2="635.44" y2="239.71"/><line class="tick" x1="635.57" y1="260.80" x2="641.37" y2="259.25"/><line class="tick" x1="640.12" y1="280.30" x2="646.01" y2="279.13"/><line class="tick" x1="643.38" y1="300.06" x2="649.33" y2="299.28"/><line class="tick" x1="645.34" y1="319.99" x2="651.33" y2="319.59"/><line class="tick major" x1="636.00" y1="340.00" x2="652.00" y2="340.00"/><line class="tick" x1="645.34" y1="360.01" x2="651.33" y2="360.41"/><line class="tick" x1="643.38" y1="379.94" x2="649.33" y2="380.72"/><line class="tick" x1="640.12" y1="399.70" x2="646.01" y2="400.87"/><line class="tick" x1="635.57" y1="419.20" x2="641.37" y2="420.75"/><line class="tick" x1="629.76" y1="438.36" x2="635.44" y2="440.29"/><line class="tick" x1="622.71" y1="457.10" x2="628.25" y2="459.40"/><line class="tick" x1="614.44" y1="475.34" x2="619.82" y2="477.99"/><line class="tick" x1="605.00" y1="493.00" x2="610.20" y2="496.00"/><line class="tick" x1="594.43" y1="510.00" x2="599.42" y2="513.34"/><line class="tick" x1="582.77" y1="526.28" x2="587.53" y2="529.93"/><line class="tick" x1="570.06" y1="541.76" x2="574.57" y2="545.72"/><line class="tick major" x1="549.30" y1="549.30" x2="560.62" y2="560.62"/><line class="tick" x1="541.76" y1="570.06" x2="545.72" y2="574.57"/><line class="tick" x1="526.28" y1="582.77" x2="529.93" y2="587.53"/><line class="tick" x1="510.00" y1="594.43" x2="513.34" y2="599.42"/><line class="tick" x1="493.00" y1="605.00" x2="496.00" y2="610.20"/><line class="tick" x1="475.34" y1="614.44" x2="477.99" y2="619.82"/><line class="tick" x1="457.10" y1="622.71" x2="459.40" y2="628.25"/><line class="tick" x1="438.36" y1="629.76" x2="440.29" y2="635.44"/><line class="tick" x1="419.20" y1="635.57" x2="420.75" y2="641.37"/><line class="tick" x1="399.70" y1="640.12" x2="400.87" y2="646.01"/><line class="tick" x1="379.94" y1="643.38" x2="380.72" y2="649.33"/><line class="tick" x1="360.01" y1="645.34" x2="360.41" y2="651.33"/><line class="tick major" x1="340.00" y1="636.00" x2="340.00" y2="652.00"/><line class="tick" x1="319.99" y1="645.34" x2="319.59" y2="651.33"/><line class="tick" x1="300.06" y1="643.38" x2="299.28" y2="649.33"/><line class="tick" x1="280.30" y1="640.12" x2="279.13" y2="646.01"/><line class="tick" x1="260.80" y1="635.57" x2="259.25" y2="641.37"/><line class="tick" x1="241.64" y1="629.76" x2="239.71" y2="635.44"/><line class="tick" x1="222.90" y1="622.71" x2="220.60" y2="628.25"/><line class="tick" x1="204.66" y1="614.44" x2="202.01" y2="619.82"/><line class="tick" x1="187.00" y1="605.00" x2="184.00" y2="610.20"/><line class="tick" x1="170.00" y1="594.43" x2="166.66" y2="599.42"/><line class="tick" x1="153.72" y1="582.77" x2="150.07" y2="587.53"/><line class="tick" x1="138.24" y1="570.06" x2="134.28" y2="574.57"/><line class="tick major" x1="130.70" y1="549.30" x2="119.38" y2="560.62"/><line class="tick" x1="109.94" y1="541.76" x2="105.43" y2="545.72"/><line class="tick" x1="97.23" y1="526.28" x2="92.47" y2="529.93"/><line class="tick" x1="85.57" y1="510.00" x2="80.58" y2="513.34"/><line class="tick" x1="75.00" y1="493.00" x2="69.80" y2="496.00"/><line class="tick" x1="65.56" y1="475.34" x2="60.18" y2="477.99"/><line class="tick" x1="57.29" y1="457.10" x2="51.75" y2="459.40"/><line class="tick" x1="50.24" y1="438.36" x2="44.56" y2="440.29"/><line class="tick" x1="44.43" y1="419.20" x2="38.63" y2="420.75"/><line class="tick" x1="39.88" y1="399.70" x2="33.99" y2="400.87"/><line class="tick" x1="36.62" y1="379.94" x2="30.67" y2="380.72"/><line class="tick" x1="34.66" y1="360.01" x2="28.67" y2="360.41"/>
+      </g>
+      <g class="arcs">
+      <path d="M 475.15 163.88 A 222 222 0 0 1 496.98 183.02" stroke="#4F6A4F" />
+      <path d="M 528.09 151.91 A 266 266 0 0 1 596.94 271.15" stroke="#2846C8" />
+      <path d="M 557.73 296.69 A 222 222 0 0 1 562.00 340.00" stroke="#7C3F5E" />
+      <path d="M 570.36 473.00 A 266 266 0 0 1 501.93 551.03" stroke="#7C3F5E" />
+      <path d="M 462.00 551.31 A 244 244 0 0 1 403.15 575.69" stroke="#2846C8" />
+      <path d="M 305.28 603.72 A 266 266 0 0 1 238.21 585.75" stroke="#8A5A16" />
+      <path d="M 204.85 516.12 A 222 222 0 0 1 163.88 475.15" stroke="#4F6A4F" />
+      </g>
+      <line class="now" x1="488.15" y1="455.74" x2="589.01" y2="534.55"/>
+      <circle cx="589.01" cy="534.55" r="4" fill="#C22F22"/>
+      <circle cx="589.01" cy="534.55" r="10" fill="#C22F22" opacity=".14"/>
+    </svg>
+    <div class="hub"><span class="weekday">星期日</span><b>08</b><span>十一月 · 2026</span><span class="rule"></span><em>已安排 6.5h</em></div>
+  </div>
+</div>
+</body></html>

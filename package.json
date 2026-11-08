@@ -1,0 +1,16 @@
+{
+  "name": "daydial",
+  "version": "1.0.0",
+  "private": true,
+  "description": "日晷 Daydial — 本地优先的 24 小时日计划工具",
+  "scripts": {
+    "serve": "python3 -m http.server 8123",
+    "test": "node tests/smoke.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

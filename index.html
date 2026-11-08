@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#E7E7E1">
+  <title>日晷 Daydial · 把一天，看成一个圆</title>
+  <meta name="description" content="日晷是一个本地优先的 24 小时日计划工具。拖动圆盘安排时间，用颜色标记一天的节奏，数据只留在浏览器里。">
+  <meta name="author" content="TuanTuan">
+  <link rel="canonical" href="https://tuantuan1020.github.io/daydial/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="日晷 Daydial · 把一天，看成一个圆">
+  <meta property="og:description" content="本地优先的 24 小时日计划工具。拖动圆盘安排时间，数据只留在浏览器里。">
+  <meta property="og:url" content="https://tuantuan1020.github.io/daydial/">
+  <meta property="og:image" content="https://tuantuan1020.github.io/daydial/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="./assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="preload" href="./assets/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./assets/fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <script>
+    // Set the theme before first paint so the paper never flashes.
+    try {
+      const saved = JSON.parse(localStorage.getItem('daydial.v1') || '{}');
+      const theme = saved.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#111512' : '#E7E7E1';
+    } catch (error) {
+      document.documentElement.dataset.theme = 'light';
+    }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#agenda">跳到今日安排</a>
+  <noscript><div class="noscript"><b>需要 JavaScript</b>日晷的圆盘和本地存储依赖 JavaScript。请启用后刷新；你的安排不会离开这台设备。</div></noscript>
+
+  <svg class="icon-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+    <symbol id="i-printer" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="7" y="14" width="10" height="7" rx="1"/></symbol>
+    <symbol id="i-keyboard" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-template" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></symbol>
+    <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></symbol>
+    <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/></symbol>
+  </svg>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="日晷 Daydial 首页">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M20 3v3M20 34v3M3 20h3M34 20h3M8 8l2 2M30 30l2 2M32 8l-2 2M10 30l-2 2" stroke="currentColor" stroke-width="1.1"/>
+        <circle cx="20" cy="20" r="1.5" fill="currentColor"/>
+        <path d="M20 20L20 9" stroke="var(--red)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text"><b>日晷</b><i>DAYDIAL</i></span>
+    </a>
+
+    <nav class="date-nav" aria-label="日期导航">
+      <button class="icon-button" id="prevDay" type="button" aria-label="前一天" title="前一天">
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"/></svg>
+      </button>
+      <button class="date-button" id="dateButton" type="button" aria-label="选择日期" title="选择日期">
+        <span id="headerDate">今天</span>
+        <svg class="icon date-chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+      </button>
+      <input class="date-input" id="datePicker" type="date" tabindex="-1" aria-label="选择日期">
+      <button class="icon-button" id="nextDay" type="button" aria-label="后一天" title="后一天">
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+      </button>
+      <button class="today-button" id="todayButton" type="button">今天</button>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-button" id="themeToggle" type="button" aria-label="切换到深色" title="切换主题">
+        <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
+      </button>
+      <button class="icon-button" id="menuButton" type="button" aria-label="更多操作" aria-haspopup="menu" aria-expanded="false" aria-controls="menuPanel" title="更多操作">
+        <svg class="icon" aria-hidden="true"><use href="#i-more"/></svg>
+      </button>
+      <div class="menu-panel" id="menuPanel" role="menu" hidden>
+        <button type="button" role="menuitem" data-action="templates"><svg class="icon" aria-hidden="true"><use href="#i-template"/></svg><span>套用模板</span></button>
+        <button type="button" role="menuitem" data-action="export-json"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg><span>导出数据</span></button>
+        <button type="button" role="menuitem" data-action="import-json"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg><span>导入数据</span></button>
+        <button type="button" role="menuitem" data-action="export-ics"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><span>导出日历</span></button>
+        <div class="menu-rule" role="separator"></div>
+        <button type="button" role="menuitem" data-action="print"><svg class="icon" aria-hidden="true"><use href="#i-printer"/></svg><span>打印今天</span></button>
+        <button type="button" role="menuitem" data-action="shortcuts"><svg class="icon" aria-hidden="true"><use href="#i-keyboard"/></svg><span>键盘快捷键</span></button>
+        <button type="button" role="menuitem" data-action="about"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><span>关于日晷</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="dial-stage" aria-labelledby="dialHeading">
+      <div class="stage-head">
+        <div>
+          <h1 id="dialHeading">把一天，看成一个圆。</h1>
+          <p class="stage-sub">24 小时 · 06:00 在顶部 · 本地保存</p>
+        </div>
+        <p class="stage-hint" id="dialHint">拖动空白处，安排一段时间</p>
+      </div>
+
+      <div class="dial-wrap">
+        <svg id="dial" class="dial" viewBox="0 0 680 680" role="group" aria-labelledby="dialAriaLabel dialHint">
+          <title id="dialAriaLabel">24 小时圆盘。单击空白处放下 1 小时安排，拖动可指定时长；右侧清单提供完整的键盘操作。</title>
+          <circle class="dial-surface" cx="340" cy="340" r="312"></circle>
+          <circle class="dial-rim" cx="340" cy="340" r="312"></circle>
+          <circle class="dial-inner" cx="340" cy="340" r="184"></circle>
+          <g class="dial-ticks" id="dialTicks" aria-hidden="true"></g>
+          <g class="dial-labels" id="dialLabels" aria-hidden="true"></g>
+          <g class="blocks-layer" id="blocksLayer" tabindex="-1" focusable="false"></g>
+          <g class="now-layer" id="nowLayer" aria-hidden="true"></g>
+          <g class="draft-layer" id="draftLayer" aria-hidden="true"></g>
+        </svg>
+
+        <div class="dial-hub">
+          <p class="hub-weekday" id="hubWeekday">—</p>
+          <p class="hub-day" id="hubDay">—</p>
+          <p class="hub-month" id="hubMonth">—</p>
+          <span class="hub-rule" aria-hidden="true"></span>
+          <p class="hub-stat" id="hubStat">正在读取本地数据</p>
+          <p class="hub-now" id="hubNow" hidden><span class="now-dot" aria-hidden="true"></span>现在 12:08</p>
+          <p class="hub-doy" id="hubDoy">—</p>
+        </div>
+
+        <div class="dial-tooltip" id="dialTooltip" hidden></div>
+      </div>
+
+      <div class="dial-legend" aria-label="安排类型">
+        <span class="legend-item"><i class="legend-dot cat-focus"></i>深度</span>
+        <span class="legend-item"><i class="legend-dot cat-meet"></i>会议</span>
+        <span class="legend-item"><i class="legend-dot cat-life"></i>生活</span>
+        <span class="legend-item"><i class="legend-dot cat-rest"></i>休息</span>
+        <span class="legend-note">颜色是节奏，不是优先级</span>
+      </div>
+    </section>
+
+    <aside class="agenda" id="agenda" tabindex="-1" aria-labelledby="agendaHeading">
+      <div class="agenda-head">
+        <div>
+          <h2 id="agendaHeading">今日安排</h2>
+          <p class="agenda-count" id="agendaCount" aria-live="polite">0 段</p>
+        </div>
+        <button class="primary-button" id="addButton" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+          <span>添加安排</span>
+        </button>
+      </div>
+
+      <label class="intention" for="intentionInput">
+        <span>今天想留一点时间给</span>
+        <input id="intentionInput" type="text" maxlength="60" placeholder="写下此刻最想照顾的事" autocomplete="off">
+      </label>
+
+      <div class="agenda-list" id="agendaList"></div>
+
+      <div class="empty-state" id="emptyState">
+        <svg class="empty-mark" viewBox="0 0 72 72" aria-hidden="true">
+          <circle cx="36" cy="36" r="27" fill="none" stroke="currentColor" stroke-width="1"/>
+          <path d="M36 9v5M36 58v5M9 36h5M58 36h5" stroke="currentColor" stroke-width="1"/>
+          <path d="M36 36V21" stroke="var(--red)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="36" cy="36" r="2" fill="currentColor"/>
+        </svg>
+        <h3>今天还空着</h3>
+        <p>先放下一段专注，或者套用一个现成的节奏。</p>
+        <div class="empty-actions">
+          <button class="secondary-button" type="button" data-empty="add">添加第一段</button>
+          <button class="text-button" type="button" data-empty="templates">套用模板</button>
+          <button class="text-button" type="button" data-empty="sample">看看示例</button>
+        </div>
+      </div>
+
+      <div class="agenda-foot">
+        <div class="stats" id="stats">
+          <span><b id="statPlanned">0h</b><small>已安排</small></span>
+          <span><b id="statFocus">0h</b><small>专注</small></span>
+          <span><b id="statDone">0/0</b><small>完成</small></span>
+        </div>
+        <div class="mix-bar" id="mixBar" aria-hidden="true" hidden></div>
+        <p class="day-shape" id="dayShape">还没有安排。今天可以慢慢开始。</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <p>这些安排只保存在这台设备的浏览器里。</p>
+    <p class="footer-links">
+      <span id="storageStatus">本地存储</span>
+      <a href="https://github.com/TuanTuan1020/daydial" target="_blank" rel="noopener">GitHub<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+    </p>
+  </footer>
+
+  <dialog class="dialog" id="blockDialog" aria-labelledby="blockDialogTitle">
+    <form id="blockForm" novalidate>
+      <div class="dialog-head">
+        <div>
+          <p class="dialog-kicker" id="blockDialogKicker">安排一段时间</p>
+          <h2 id="blockDialogTitle">添加安排</h2>
+        </div>
+        <button class="icon-button" type="button" data-close-dialog aria-label="关闭">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+        </button>
+      </div>
+
+      <label class="field">
+        <span class="field-label">做什么</span>
+        <input id="blockTitle" name="title" type="text" maxlength="60" placeholder="例如：写产品方案" autocomplete="off" required>
+      </label>
+
+      <div class="time-row">
+        <label class="field">
+          <span class="field-label">开始</span>
+          <input id="blockStart" name="start" type="time" step="900" required>
+        </label>
+        <span class="time-dash" aria-hidden="true">—</span>
+        <label class="field">
+          <span class="field-label">结束</span>
+          <input id="blockEnd" name="end" type="time" step="900" required>
+        </label>
+        <p class="duration-readout" id="durationReadout">1 小时</p>
+      </div>
+
+      <fieldset class="category-field">
+        <legend class="field-label">类型</legend>
+        <div class="category-picker" id="categoryPicker">
+          <label class="category-option cat-focus"><input type="radio" name="category" value="focus" checked><span class="category-dot"></span><span>深度</span></label>
+          <label class="category-option cat-meet"><input type="radio" name="category" value="meet"><span class="category-dot"></span><span>会议</span></label>
+          <label class="category-option cat-life"><input type="radio" name="category" value="life"><span class="category-dot"></span><span>生活</span></label>
+          <label class="category-option cat-rest"><input type="radio" name="category" value="rest"><span class="category-dot"></span><span>休息</span></label>
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span class="field-label">备注 <small>可选</small></span>
+        <textarea id="blockNote" name="note" rows="2" maxlength="140" placeholder="地点、准备事项，或者一句提醒"></textarea>
+      </label>
+
+      <p class="form-error" id="formError" role="alert" hidden></p>
+      <p class="form-notice" id="formNotice" role="status" hidden></p>
+
+      <div class="dialog-foot">
+        <button class="danger-button" id="deleteBlock" type="button">
+          <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+          <span>删除</span>
+        </button>
+        <span class="dialog-spacer"></span>
+        <button class="secondary-button" type="button" data-close-dialog>取消</button>
+        <button class="primary-button" id="saveBlock" type="submit">保存安排</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog dialog-wide" id="templatesDialog" aria-labelledby="templatesTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="dialog-kicker">不用从空白开始</p>
+        <h2 id="templatesTitle">套用一个节奏</h2>
+      </div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="关闭">
+        <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <div class="template-list" id="templateList">
+      <button class="template-card" type="button" data-template="deep">
+        <span class="template-swatch" aria-hidden="true"><i class="cat-focus"></i><i class="cat-focus"></i><i class="cat-rest"></i></span>
+        <span class="template-copy"><b>深度日</b><small>两段不被打断的工作，留出散步和阅读。</small></span>
+        <span class="template-count">5 段</span>
+      </button>
+      <button class="template-card" type="button" data-template="meeting">
+        <span class="template-swatch" aria-hidden="true"><i class="cat-meet"></i><i class="cat-meet"></i><i class="cat-focus"></i></span>
+        <span class="template-copy"><b>会议日</b><small>把会议聚在一起，中间留出恢复的空隙。</small></span>
+        <span class="template-count">4 段</span>
+      </button>
+      <button class="template-card" type="button" data-template="rest">
+        <span class="template-swatch" aria-hidden="true"><i class="cat-life"></i><i class="cat-rest"></i><i class="cat-life"></i></span>
+        <span class="template-copy"><b>休息日</b><small>不追进度，只安排让身体舒服的事。</small></span>
+        <span class="template-count">4 段</span>
+      </button>
+      <button class="template-card" type="button" data-template="sample">
+        <span class="template-swatch" aria-hidden="true"><i class="cat-life"></i><i class="cat-focus"></i><i class="cat-meet"></i><i class="cat-rest"></i></span>
+        <span class="template-copy"><b>示例一天</b><small>看看圆盘被填满时，一天可以是什么形状。</small></span>
+        <span class="template-count">7 段</span>
+      </button>
+    </div>
+    <div class="dialog-foot template-foot">
+      <button class="danger-button" id="clearDay" type="button">
+        <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+        <span>清空今天</span>
+      </button>
+      <span class="dialog-spacer"></span>
+      <button class="secondary-button" type="button" data-close-dialog>取消</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog dialog-small" id="confirmDialog" aria-labelledby="confirmTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="dialog-kicker">请确认</p>
+        <h2 id="confirmTitle">替换今天的安排？</h2>
+      </div>
+    </div>
+    <p class="confirm-copy" id="confirmCopy"></p>
+    <div class="dialog-foot">
+      <span class="dialog-spacer"></span>
+      <button class="secondary-button" type="button" data-confirm="cancel">取消</button>
+      <button class="primary-button" type="button" data-confirm="ok" id="confirmOk">确认</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog dialog-small" id="shortcutsDialog" aria-labelledby="shortcutsTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="dialog-kicker">不用离开键盘</p>
+        <h2 id="shortcutsTitle">快捷键</h2>
+      </div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="关闭">
+        <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <dl class="shortcut-list">
+      <div><dt><kbd>N</kbd></dt><dd>添加一段安排</dd></div>
+      <div><dt><kbd>T</kbd></dt><dd>回到今天</dd></div>
+      <div><dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>前一天 / 后一天</dd></div>
+      <div><dt><kbd>?</kbd></dt><dd>打开这个列表</dd></div>
+      <div><dt><kbd>Esc</kbd></dt><dd>关闭弹窗或菜单</dd></div>
+    </dl>
+  </dialog>
+
+  <dialog class="dialog dialog-small" id="aboutDialog" aria-labelledby="aboutTitle">
+    <div class="dialog-head">
+      <div>
+        <p class="dialog-kicker">关于</p>
+        <h2 id="aboutTitle">日晷 Daydial</h2>
+      </div>
+      <button class="icon-button" type="button" data-close-dialog aria-label="关闭">
+        <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>
+      </button>
+    </div>
+    <p class="about-copy">日晷把一天画成一个 24 小时的圆。每一段安排是圆上的一段弧，红色指针是此刻。右侧清单是它的账本，负责精确编辑，也负责让每个人都能用键盘完成同样的事。</p>
+    <p class="about-copy">没有账号，没有后端，没有追踪。所有安排保存在浏览器的 <code>localStorage</code> 里。换设备时，用“导出数据”带走它们。</p>
+    <div class="about-meta">
+      <span>设计 / 开发：TuanTuan</span>
+      <a href="https://github.com/TuanTuan1020/daydial" target="_blank" rel="noopener">查看源码<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+    </div>
+    <div class="dialog-foot">
+      <span class="dialog-spacer"></span>
+      <button class="secondary-button" type="button" data-close-dialog>知道了</button>
+    </div>
+  </dialog>
+
+  <input type="file" id="importInput" accept="application/json,.json" hidden>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>
