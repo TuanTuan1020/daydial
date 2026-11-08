@@ -259,6 +259,10 @@ f2b24f59d706c461c5f436826d0cd647d8ad32e945a96a9129f3e5efb2d195d1  sw.js
 **3 个 High 全部修复，均有实测证据；Medium 修好 9 项，Low 修好 6 项；新增 1 个 Medium 回归（方向键）。**
 没有新的 Blocker 或 High，可以发布。建议随后补掉 R1（约 2 行），并对 M1 做一个明确决定。
 
+> **构建漂移说明**：本轮复审针对上表那组冻结哈希。复审进行中，`assets/js/app.js`（16:13）与 `assets/css/style.css`（16:13、16:14:45）又在磁盘上被改动过，因此"当前工作区"并不等于上表。
+> 现有工作区（app.js `ee4a0c57…`、style.css `6265cf7a…`）我已按同一套用例复验：**R1 已修复**（见下），新增刻度淡入，功能/响应式/对比度/控制台均干净，无 4xx。
+> 上表结论对冻结版成立；对现有工作区的差异只有这三点，且都是改善。发布前请确认以哪一组哈希作为发布物。
+
 ## 已核验修复
 
 | # | 状态 | 实测证据 |
@@ -284,7 +288,13 @@ f2b24f59d706c461c5f436826d0cd647d8ad32e945a96a9129f3e5efb2d195d1  sw.js
 
 ## 新增问题（回归）
 
-### R1（Medium）弹窗关闭后 ←/→ 静默失效
+### R1（Medium）弹窗关闭后 ←/→ 静默失效 —— **在后续构建中已修复**
+
+> 现状：`assets/js/app.js`（`ee4a0c57…`，16:13）已把早退条件收窄为
+> `const arrowConsumer = target.closest?.("input, textarea, select, [role='menu'], [role='listbox'], [role='slider']")`，
+> 实测 `?`→Esc→`ArrowRight` 正常进到次日、`ArrowLeft` 回到当日；对话框打开时方向键仍被 `dialog[open]` 拦住，单选组的方向键行为保留（实测 ←/→ 在类型单选组内正常切换）。
+> 下面保留原始记录以便追溯。
+
 `assets/js/app.js`（`rememberFocus`/`restoreFocus` 与 keydown 的 `interactive` 早退）
 
 **现象**：按 `?` 打开快捷键 → Esc → 焦点落到 `#addButton` → 按 → 日期不变。保存、删除、`N` 后 Esc 同样。`T`、`N` 正常（它们在早退之前处理）。
@@ -306,7 +316,7 @@ if (arrowConsumer) return;
 
 **残余 Nit（都不阻断发布）**
 
-- `item-check` 有效命中区 42×42 而非 44×44：`:before` 用了 `border-radius: 50%`，圆内接于 44 方框；改成方形即为干净的 44×44。
+- `item-check` 有效命中区 42×42 而非 44×44：`.item-check::before` 的 `inset: -9px` 是相对**内边距盒**（26px 减去左右各 1px 边框 = 24px）解析的，24 + 18 = 42。改成 `inset: -10px` 即为干净的 44×44（`border-radius: 10px` 已让四角可命中）。
 - 320px 表头里前/后一天按钮被 flex 压到 41×44（高度够，宽度差 3px）。
 - `.intentionInput` 高 23px，仍小于 44px 触控目标（文本输入，M7 未覆盖）。
 - 5 处仍是 9px，低于简报新定的 10px 下限（`.brand-text i`、`.dial-tooltip span/em`、≤440 的 `.hub-month`、≤700 的 `.item-duration`）；其中 tooltip 仍用 `opacity .65/.78`，与简报"不用透明度压暗"一句不一致（但对比度实测 6.62 / 9.01，达标）。

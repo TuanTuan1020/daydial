@@ -787,7 +787,7 @@
     color: transparent;
     transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease), color 0.18s var(--ease);
   }
-  .item-check::before { content: ""; position: absolute; inset: -9px; border-radius: 10px; }
+  .item-check::before { content: ""; position: absolute; inset: -10px; border-radius: 10px; }
   .item-check .icon { width: 14px; height: 14px; }
   .item-check:hover { border-color: var(--cat); color: var(--cat); }
   .agenda-item.is-done .item-check { background: var(--ink); border-color: var(--ink); color: var(--paper); }
