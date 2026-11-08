@@ -790,8 +790,8 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
-  const interactive = target.closest?.("button, a, [role='button']");
-  if (interactive) return;
+  const arrowConsumer = target.closest?.("input, textarea, select, [role='menu'], [role='listbox'], [role='slider']");
+  if (arrowConsumer) return;
   if (event.key === "ArrowLeft") {
     event.preventDefault();
     setDate(addDays(currentKey, -1));

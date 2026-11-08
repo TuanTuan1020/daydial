@@ -6,6 +6,8 @@
 （SHA-256 见文末附录；评审期间 `assets/js/app.js` 有一处改动——导入后跳转日期的分支——已重新跑过全量功能用例。）
 **Method**：Chrome headless (Playwright, channel=chrome) + 代码通读 + 计算样式 / 几何盒 / 像素采样。未修改任何站点文件。
 
+> **Lead follow-up after re-check:** R1 is fixed (the arrow-key exclusion now only skips arrow-consuming controls; `?` → Esc → ArrowRight works). M1 is accepted as an intentional 06:00-top / 00-at-9-o'clock orientation and documented in the design brief. The item-check pseudo hit area is now a square 44×44, 9px declarations were raised to 10px, tooltip opacity was removed, and the intention field is 44px tall. The 320px icon-width nit is also fixed; N2/N4/N5 are accepted trade-offs.
+
 ---
 
 ## 摘要与结论
@@ -13,6 +15,8 @@
 站点功能完整、健壮性不错：79 项功能用例通过 78 项（唯一"失败"是导入后跳转到备份最后一天，属有意改动）；6 个宽度无横向溢出；5 个弹窗全部适配到 320px；XSS 安全；localStorage 脏数据全部被安全降级；Service Worker 离线可用；深色模式无残留浅色值。
 
 **结论：没有 Blocker。修掉 3 个 High 后可以发布。**
+
+> **复审后状态（2026-11-08，见文末「复审」一节）**：3 个 High 全部修复并有实测证据；M2–M10 与大部分 Low 已修；新增 1 个 Medium 回归（弹窗关闭后 ←/→ 失效）；M1 仍未处理也未声明保留。**建议修掉该回归 + 对 M1 做决定后发布。**
 
 三个 High 分别是：跨午夜拖动会生成错误的 12 小时块、Service Worker 缓存优先导致部署后老用户永远拿旧 CSS/JS、圆盘弧段与中心节奏环的零点相差 90°。
 
@@ -233,3 +237,92 @@ eeda0af7…d2766  assets/js/dial.js
 6d73b99a…ea0d0  sw.js
 4e3900d6…8ff56c manifest.webmanifest
 ```
+
+---
+
+# 复审（修复后 · 2026-11-08）
+
+**复审对象**
+
+```
+2b1e69c2eb01e80a27343ba34125651b31a67577583a1b76b87a27eeeb431af2  index.html
+557e298b1c551b1646b43436ac61200e096303b205bfee9bbafab864b3668b41  assets/css/style.css
+a9bdf19e7e5c15fdbb1322b7b3de276588a74ee4879701b0b8b3c4eb714c891a  assets/js/app.js
+24d5c99a021071ccd474937a7b33f948deb6d7941db0e6071d71a1974eea77a2  assets/js/data.js
+ef48fe6be7aff142d5fdd3e04a6ee05071834a7896d223e40b3cbb9cc056d902  assets/js/dial.js
+f2b24f59d706c461c5f436826d0cd647d8ad32e945a96a9129f3e5efb2d195d1  sw.js
+4e3900d6e142f47c6ab3b9465e2ad6f61550baa92d62e026b4b80bb9e48ff56c  manifest.webmanifest（未变）
+```
+
+## 复审结论
+
+**3 个 High 全部修复，均有实测证据；Medium 修好 9 项，Low 修好 6 项；新增 1 个 Medium 回归（方向键）。**
+没有新的 Blocker 或 High，可以发布。建议随后补掉 R1（约 2 行），并对 M1 做一个明确决定。
+
+## 已核验修复
+
+| # | 状态 | 实测证据 |
+|---|---|---|
+| H1 跨午夜拖动 | ✅ | 22:00→02:00 与 02:00→22:00 都得到 **22:00–23:45**；拖动中提示「22:00 – 23:45 / 1 小时 45 分 / 跨午夜，截到 23:45」与对话框、与落库值（1320/1425）三者一致；对话框内 `#formNotice`（`role=status`，对比度 9.02:1）说明"0 点后的部分请放到下一天"；未点保存前 localStorage 为空 |
+| H2 SW 缓存 | ✅ | 干净 profile：`caches` 初始为空 → 只有 `daydial-v2`；缓存集合与 `sw.js` core 列表 **14/14 完全一致**；SWR 用路由拦截实测：首次返回**缓存的旧 body**（无探针），后台再验证后缓存内出现新 body（有探针），网络命中 1 次；预置的 `daydial-v1` 在 activate 时被删除；离线刷新完整渲染；全程 0 个 4xx |
+| H3 构成环 | ✅ | `#mixRing` / `.mix-seg` / `.mix-base` 均已从 DOM 消失；`#mixBar` 位于 `.agenda-foot`，`aria-hidden`，空数据时隐藏；3 段 flex 360/180/60 → 实测宽 240/120/40 = 60/30/10%，无溢出 |
+| M2 完成态 | ✅ | 实测 `opacity 0.35`、`stroke-dasharray: 0.06px 0.04px` 真正生效（上一版是不匹配的 `.dial-block.is-done`） |
+| M3 午夜 | ✅ | 点 23:45 → **22:45–23:45**，两个 time input 的 `stepMismatch` 均为 false |
+| M4 刻度 | ✅ | 有效字号：320 → **9.19px**（原 4.18）、375 → 10.97、1440 → 10.19；`tick.major` 描边 320 → 1.17px（原 0.54） |
+| M5 焦点还原 | ✅ | 菜单关闭 → `#menuButton`；保存 → `#addButton`；删除 → `#addButton` |
+| M6 幽灵 Tab 位 | ✅ | Tab 顺序：menuButton → **第一个弧段**（`g.blocks-layer` 已不再停靠）；`tabindex="-1" focusable="false"` 生效 |
+| M7 触控目标 | ✅* | `.item-check` 视觉 26×26，`::before inset:-9px` 使**有效命中区 42×42**（逐点扫描确认）；今天按钮 44.3×44；`.item-main` 已达 44 |
+| M8 小字对比度 | ✅ | `legend-note` 5.17 / 8.10，`hub-doy` 5.17 / 8.10（浅/深），字号提到 10px，占位符不再降透明度 |
+| M9 排版比例 | ✅* | 简报改为 10/11/12/14/16/20/…，并声明 10–11px 仅用于元数据/刻度；1024px 恢复双栏（567 + 340） |
+| M10 会议色 | ✅ | `--cat-meet: #7C3F5E`（深色 `#E7A3BC`），与 `--red: #C22F22` 分离；简报原则 3 同步改写 |
+| L4 打印溢出 | ✅ | print 媒体 `scrollWidth 1440 == 1440`（原 1448），`.agenda-item` margin 归零 |
+| L5 button 内 h3 | ✅ | 现在是 `<span class="item-title">` |
+| L6 重复 id | ✅ | 导入重复 id → 内存中第二条被重生成 UUID（`same` + `2493bbca…`） |
+| L13 无 JS 占位 | ✅ | `headerDate`="今天"、hub 各字段 "—"、"正在读取本地数据"，`hubNow` 默认 hidden，并新增 `<noscript>` |
+
+\* 见下方残余项。
+
+## 新增问题（回归）
+
+### R1（Medium）弹窗关闭后 ←/→ 静默失效
+`assets/js/app.js`（`rememberFocus`/`restoreFocus` 与 keydown 的 `interactive` 早退）
+
+**现象**：按 `?` 打开快捷键 → Esc → 焦点落到 `#addButton` → 按 → 日期不变。保存、删除、`N` 后 Esc 同样。`T`、`N` 正常（它们在早退之前处理）。
+**原因**：M5 的修复把焦点还原到按钮，而方向键分支前有 `const interactive = target.closest?.("button, a, [role='button']"); if (interactive) return;`。旧版焦点落到 `<body>`，所以没暴露。
+**影响**：快捷键面板正是用户学会 ←/→ 的地方，学完立刻"失灵"。
+**复现**：`?` → Esc → `ArrowRight`（表头停在 2026年11月8日）。
+**建议**：把"任意按钮都跳过"收窄为"只跳过会消费方向键的控件"，例如
+```js
+const arrowConsumer = target.closest?.("input, textarea, select, [role='menu']");
+if (arrowConsumer) return;
+```
+这样保留输入框/单选组的原生方向键行为，普通按钮不再吞掉 ←/→。
+
+## 仍未关闭
+
+| # | 状态 | 说明 |
+|---|---|---|
+| M1 | ⚠️ 待决定 | `angleFor` 未改：`00`→180°（9 点方向）、`06`→-90°（正上）。**不在修复清单内，也不在"有意保留"清单内**，故按未处理记录。两种收尾：(a) 接受并在简报写明"00:00 在 9 点方向、06:00 在正上，日出在顶"；(b) 改一行 —— H3 移除构成环后，`angleFor()` 已是刻度/标签/弧段/草稿/指针的唯一来源，改它不会再牵动其它几何，风险远低于修复前 |
+
+**残余 Nit（都不阻断发布）**
+
+- `item-check` 有效命中区 42×42 而非 44×44：`:before` 用了 `border-radius: 50%`，圆内接于 44 方框；改成方形即为干净的 44×44。
+- 320px 表头里前/后一天按钮被 flex 压到 41×44（高度够，宽度差 3px）。
+- `.intentionInput` 高 23px，仍小于 44px 触控目标（文本输入，M7 未覆盖）。
+- 5 处仍是 9px，低于简报新定的 10px 下限（`.brand-text i`、`.dial-tooltip span/em`、≤440 的 `.hub-month`、≤700 的 `.item-duration`）；其中 tooltip 仍用 `opacity .65/.78`，与简报"不用透明度压暗"一句不一致（但对比度实测 6.62 / 9.01，达标）。
+- N2 未变：`body` 仍用 `radial-gradient` 画点阵，简报 §4 仍写"不用渐变"。
+- N4/N5 按约定保留（菜单 Tab 不关闭、canonical/og 绑部署域名）。
+
+## 本轮复验通过（回归面）
+
+功能：79 项用例除下述 3 项外全部通过——「duration readout」因统一为 `2.5h` 口径（预期变化）、「ArrowRight → 次日」与随之的「今天按钮启用」为 R1 所致；导入后跳到备份最后一天为既有有意行为。
+响应式：320/375/414/768/1024 全部 `scrollWidth === clientWidth`，无越界元素、无文字裁剪、页头三块不重叠；5 个弹窗在 320 上最小边距 19px、无内部横向滚动；1024 为双栏（567+340），980 以下单栏。
+对比度（浅/深）：正文 14.2/15.4，muted 小字 5.17/8.10，主按钮 5.64/6.25，危险 4.97/5.74，toast 14.2，formError 5.07，formNotice 9.02，tooltip 14.2/9.01/6.62。
+深色模式：0 个残留浅色值。减弱动效：`animation-duration 1e-05s`、`dashoffset 0`、`scroll-behavior auto`。
+健壮性：非法 JSON/null/数组/负值/NaN/end≤start/>12h/`__proto__`/重复 id 全部安全降级，无原型污染；XSS 载荷按文本渲染。
+PWA：v2 缓存、SWR、activate 清理旧版本、离线可用，均实测。
+全程 0 个 console error、0 个 pageerror、0 个 4xx。
+
+## 复审未能核验（与首轮相同）
+
+真实读屏软件播报、原生日期选择器 UI、Safari/iOS 实机、A2HS、真实打印成品、真机触控手势。

@@ -239,7 +239,7 @@
   .brand-text i {
     margin-top: 4px;
     font-family: var(--font-mono);
-    font-size: 9px;
+    font-size: 10px;
     font-style: normal;
     letter-spacing: 0.2em;
     color: var(--muted);
@@ -251,7 +251,9 @@
     align-items: center;
     gap: 2px;
   }
+  .date-nav .icon-button { flex: 0 0 44px; }
   .date-button {
+    min-width: 0;
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -655,8 +657,8 @@
     text-align: left;
   }
   .dial-tooltip b { display: block; font-size: 12px; font-weight: 600; }
-  .dial-tooltip span { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 9px; opacity: 0.78; }
-  .dial-tooltip em { display: block; margin-top: 3px; font-style: normal; font-size: 9px; opacity: 0.65; }
+  .dial-tooltip span { display: block; margin-top: 2px; font-family: var(--font-mono); font-size: 10px; }
+  .dial-tooltip em { display: block; margin-top: 3px; font-style: normal; font-size: 10px; }
   .dial-tooltip.is-below { transform: translate(-50%, 0); }
 
   .dial-legend {
@@ -745,6 +747,7 @@
   }
   .intention input {
     width: 100%;
+    min-height: 44px;
     margin-top: 4px;
     padding: 0;
     border: 0;
@@ -784,7 +787,7 @@
     color: transparent;
     transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease), color 0.18s var(--ease);
   }
-  .item-check::before { content: ""; position: absolute; inset: -9px; border-radius: 50%; }
+  .item-check::before { content: ""; position: absolute; inset: -9px; border-radius: 10px; }
   .item-check .icon { width: 14px; height: 14px; }
   .item-check:hover { border-color: var(--cat); color: var(--cat); }
   .agenda-item.is-done .item-check { background: var(--ink); border-color: var(--ink); color: var(--paper); }
@@ -1250,7 +1253,7 @@
     .dial-hub { left: 22%; top: 22%; width: 56%; height: 56%; }
     .hub-day { font-size: clamp(56px, 17vw, 78px); }
     .hub-weekday { font-size: 12px; }
-    .hub-month { font-size: 9px; }
+    .hub-month { font-size: 10px; }
     .hub-doy { display: none; }
     .dial-legend { gap: 7px 12px; }
     .legend-note { display: none; }
@@ -1261,7 +1264,7 @@
       padding: 13px 6px;
       margin: 0 -6px;
     }
-    .item-duration { font-size: 9px; }
+    .item-duration { font-size: 10px; }
     .item-title { font-size: 13px; }
     .item-note { font-size: 10px; }
     .stats { gap: 18px; }
